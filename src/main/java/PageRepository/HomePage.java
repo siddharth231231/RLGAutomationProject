@@ -14,6 +14,8 @@ public class HomePage extends AbstractComponent  {
         super(driver);
 		this.driver=driver;
 		//LogUtils.info("homepage login");
+		//
+		//
 	}
 
 	
