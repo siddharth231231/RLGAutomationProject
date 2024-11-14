@@ -1,0 +1,45 @@
+trigger:
+  branches:
+    include:
+      - master  # or your branch name
+
+pool:
+  vmImage: 'windows-latest'  # You can also use 'ubuntu-latest' if your tests are platform-independent
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$(Pipeline.Workspace)/.m2/repository"
+
+steps:
+- task: UseJava@1
+  inputs:
+    versionSpec: '11'  # Specify the Java version your project needs, e.g., 8, 11, or 17
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean install'
+    options: '-DskipTests=true'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'  # Use the same Java version here as above
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: true
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'test'
+    options: '-Dsurefire.suiteXmlFiles=testng.xml'  # Adjust if your suite file has a different name
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/*.xml'
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/surefire-reports/*.xml'
+    testRunTitle: 'TestNG Tests'
+    failTaskOnFailedTests: true  # Optionally, you can set this to false if you don't want the pipeline to fail on test failures
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: 'target'  # Adjust if your test results are located elsewhere
+    artifactName: 'selenium-tests'
