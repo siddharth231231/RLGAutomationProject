@@ -10,10 +10,6 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$(Pipeline.Workspace)/.m2/repository"
 
 steps:
-- task: UseJava@1
-  inputs:
-    versionSpec: '11'  # Specify the Java version your project needs, e.g., 8, 11, or 17
-
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
